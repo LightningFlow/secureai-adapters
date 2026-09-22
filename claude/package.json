@@ -1,0 +1,13 @@
+{
+  "name": "secureai-claude",
+  "version": "0.1.0",
+  "description": "SecureAI Claude Code adapter (hooks/MCP/proxy-env helper). Core owns Protected.",
+  "license": "UNLICENSED",
+  "private": false,
+  "files": ["README.md", "plugin/**"],
+  "secureai": {
+    "platform": "claude",
+    "classification": "PACKAGED",
+    "requiresCore": true
+  }
+}

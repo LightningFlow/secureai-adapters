@@ -1,0 +1,3 @@
+# Snippet for ~/.codex/config.toml — no blanket permissions
+# [mcp_servers.secureai]
+# command = "secureai-mcp-bridge"

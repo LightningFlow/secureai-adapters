@@ -1,0 +1,7 @@
+{
+  "tools": [
+    { "name": "secureai_status", "description": "Core status" },
+    { "name": "secureai_protect", "description": "Request protect" },
+    { "name": "secureai_off", "description": "Request disconnect" }
+  ]
+}

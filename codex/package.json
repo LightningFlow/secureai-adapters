@@ -1,0 +1,15 @@
+{
+  "name": "secureai-codex",
+  "version": "0.1.0",
+  "description": "SecureAI Codex adapter (hooks/MCP bridge). Core owns Protected. Provider TLS: Partial Protection.",
+  "license": "UNLICENSED",
+  "private": false,
+  "files": ["README.md", "plugin/**"],
+  "secureai": {
+    "platform": "codex",
+    "classification": "PACKAGED",
+    "protection": "Partial",
+    "requiresCore": true,
+    "monetization": "no-in-plugin-checkout"
+  }
+}

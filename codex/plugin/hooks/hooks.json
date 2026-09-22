@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "command": "node ${SECUREAI_ADAPTER}/scripts/pretool.js",
+        "note": "Observability / policy query only — do not grant blanket shell"
+      }
+    ]
+  }
+}

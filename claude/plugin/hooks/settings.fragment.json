@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "node ${SECUREAI_ADAPTER}/hooks/session-start.js"
+      }
+    ]
+  }
+}

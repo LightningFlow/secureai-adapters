@@ -1,0 +1,6 @@
+{
+  "name": "secureai",
+  "version": "0.1.0",
+  "description": "SecureAI thin adapter for Cursor — status/protect via Core; does not intercept model TLS",
+  "mcp": "mcp.json"
+}

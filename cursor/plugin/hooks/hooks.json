@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "node",
+        "args": ["${SECUREAI_ADAPTER}/scripts/session-start.js"],
+        "description": "Request Auto-Protect from SecureAI Core when policy allows"
+      }
+    ],
+    "sessionEnd": [
+      {
+        "command": "node",
+        "args": ["${SECUREAI_ADAPTER}/scripts/session-end.js"]
+      }
+    ]
+  }
+}

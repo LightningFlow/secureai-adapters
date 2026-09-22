@@ -1,0 +1,18 @@
+{
+  "name": "secureai-cursor",
+  "version": "0.1.0",
+  "description": "SecureAI Cursor adapter (MCP + hooks). Core owns Protected. Provider TLS: Partial Protection.",
+  "license": "UNLICENSED",
+  "private": false,
+  "files": [
+    "README.md",
+    "plugin/**"
+  ],
+  "secureai": {
+    "platform": "cursor",
+    "classification": "PACKAGED",
+    "protection": "Partial",
+    "requiresCore": true,
+    "note": "Does not intercept provider TLS; adapters must not invent Protected"
+  }
+}

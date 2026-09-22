@@ -1,0 +1,13 @@
+{
+  "name": "secureai-grok",
+  "version": "0.1.0",
+  "description": "SecureAI Grok adapter + connector. Core/relay owns Protected; connector never self-declares Protected.",
+  "license": "UNLICENSED",
+  "private": false,
+  "files": ["README.md", "plugin/**"],
+  "secureai": {
+    "platform": "grok",
+    "classification": "PACKAGED",
+    "requiresCore": true
+  }
+}
