@@ -27,7 +27,9 @@ node connector.js protect   # still refuses protected=true without Core
 - Otherwise: egress probe **through** the CONNECT/HTTP gateway proxy requiring a gateway-attested proof.
 - If remote cannot reach the LF-HOST loopback gateway and no relay is configured: `Unsupported` / `GROK_GATEWAY_DEPENDENCY`.
 - Core remains the authority for session `Protected`.
-- The Core gateway key is sent only to the literal loopback HTTP gateway. The
+- The Core gateway key is sent only to a configured literal loopback HTTP
+  endpoint. A custom loopback port is trusted configuration; the connector
+  cannot attest the listener is Core before sending the key. The
   separate relay secret is sent only to an explicitly configured HTTPS relay
   (or literal loopback HTTP for local tests). No telemetry endpoint is used.
 

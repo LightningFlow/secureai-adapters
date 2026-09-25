@@ -161,6 +161,10 @@ async function main() {
         'http://gateway.example.invalid:17864',
         'http://127.0.0.1.evil.example:17864',
         'http://127.0.0.1:17864@evil.example',
+        'http://0177.0.0.1:17864',
+        'http://0x7f000001:17864',
+        'http://2130706433:17864',
+        'http://127.0.0.1.:17864',
         'https://127.0.0.1:17864',
         'http://127.0.0.1:17864/other',
       ]) {

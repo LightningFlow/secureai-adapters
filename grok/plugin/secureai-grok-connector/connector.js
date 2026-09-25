@@ -50,6 +50,11 @@ function useRelay() {
 function proxyUrl() {
   if (useRelay()) return relayUrl();
   const raw = env('SECUREAI_PROXY_URL', `http://127.0.0.1:${env('SECUREAI_GATEWAY_PORT', '17864')}`);
+  // Check raw spelling before URL canonicalization: Node accepts numeric aliases
+  // such as 2130706433 and 0177.0.0.1 as loopback addresses.
+  if (!/^http:\/\/(?:127\.0\.0\.1|\[::1\])(?::[0-9]{1,5})?\/?$/.test(raw)) {
+    throw new Error('gateway_url_requires_loopback');
+  }
   let parsed;
   try {
     parsed = new URL(raw);
