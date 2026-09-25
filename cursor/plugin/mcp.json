@@ -2,7 +2,7 @@
   "mcpServers": {
     "secureai": {
       "command": "node",
-      "args": ["${env:SECUREAI_HOME}/adapters/cursor/lib/mcp-server.js", "--platform", "cursor"]
+      "args": ["${CURSOR_PLUGIN_ROOT}/lib/mcp-server.js", "--platform", "cursor"]
     }
   }
 }

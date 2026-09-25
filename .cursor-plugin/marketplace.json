@@ -1,0 +1,17 @@
+{
+  "name": "lightningflow",
+  "owner": {
+    "name": "LightningFlow"
+  },
+  "metadata": {
+    "description": "Free SecureAI adapter for checking local Core status in Cursor. SecureAI Core is a separate subscription."
+  },
+  "plugins": [
+    {
+      "name": "secureai",
+      "source": "cursor/plugin",
+      "description": "Check local SecureAI Core status and request protection for supported tools. Cursor's own AI requests are outside SecureAI coverage. The adapter is free; Core is a separate subscription.",
+      "category": "security"
+    }
+  ]
+}
