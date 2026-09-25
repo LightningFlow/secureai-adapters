@@ -1,0 +1,7 @@
+{
+  "name": "secureai",
+  "version": "0.1.0",
+  "description": "Shows SecureAI protection status in Claude Code and turns protection on when a session starts (if you chose automatic protection).",
+  "author": { "name": "LightningFlow" },
+  "homepage": "https://lightningflow.ai/secureai/"
+}

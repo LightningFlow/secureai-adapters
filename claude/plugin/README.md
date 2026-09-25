@@ -1,5 +1,28 @@
-# Claude Code adapter
+# SecureAI for Claude Code
 
-Hooks + MCP + `proxy-env-helper` (sh/ps1) for local `HTTP_PROXY` toward SecureAI gateway.
+A Claude Code plugin that:
 
-Core remains Protected authority. See `docs/INSTALL_CLAUDE.md`.
+- turns SecureAI protection on when a session starts, **if** you chose automatic
+  protection in SecureAI;
+- adds `secureai_status`, `secureai_protect` and `secureai_off` tools, so you can ask
+  Claude "is SecureAI on?".
+
+Status always comes from SecureAI on this computer; the plugin never decides it.
+
+## Layout (built package)
+
+```
+.claude-plugin/plugin.json
+hooks/hooks.json              SessionStart → lib/session-hook.js
+.mcp.json                     secureai MCP server → lib/mcp-server.js
+lib/                          shared SecureAI client (copied from adapters/shared at build)
+proxy-env-helper/             per-terminal proxy helper
+hooks/settings.fragment.json  manual install (uses $SECUREAI_HOME)
+```
+
+Build the package with `scripts/build-adapters.ps1` (or `.sh`); `lib/` is generated.
+
+## Routing Claude Code through SecureAI
+
+Run `secureai setup --platform claude` (or use the tray menu). See
+`proxy-env-helper/README.md`. Claude Desktop is not covered.

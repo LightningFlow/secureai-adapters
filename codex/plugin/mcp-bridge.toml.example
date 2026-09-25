@@ -1,3 +1,6 @@
-# Snippet for ~/.codex/config.toml — no blanket permissions
-# [mcp_servers.secureai]
-# command = "secureai-mcp-bridge"
+# Add to ~/.codex/config.toml to get SecureAI status tools in Codex.
+# Adjust the path if SecureAI is installed somewhere else.
+# This grants no shell or file permissions.
+[mcp_servers.secureai]
+command = "node"
+args = ["C:\\Program Files\\SecureAI\\adapters\\codex\\lib\\mcp-server.js", "--platform", "codex"]

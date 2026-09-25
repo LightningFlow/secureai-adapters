@@ -1,13 +1,21 @@
 {
   "name": "secureai-grok",
   "version": "0.1.0",
-  "description": "SecureAI Grok adapter + connector. Core/relay owns Protected; connector never self-declares Protected.",
-  "license": "UNLICENSED",
+  "description": "SecureAI for Grok: local status and a connector that verifies the gateway or relay path. SecureAI decides protection status, not the connector.",
+  "license": "MIT",
   "private": false,
-  "files": ["README.md", "plugin/**"],
+  "files": [
+    "README.md",
+    "plugin/**",
+    "plugin/**/.*",
+    "plugin/**/.*/**"
+  ],
   "secureai": {
     "platform": "grok",
     "classification": "PACKAGED",
     "requiresCore": true
+  },
+  "scripts": {
+    "prepack": "node -e \"require('fs').accessSync('plugin/lib/secureai-core.js')\""
   }
 }

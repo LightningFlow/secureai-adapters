@@ -1,39 +1,30 @@
-# Claude proxy-env helper
+# Claude Code proxy helper
 
-Sets `HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY` for **local** Claude Code sessions so traffic can use the SecureAI loopback CONNECT gateway.
+**Recommended:** use *Set up Claude Code* in the SecureAI tray menu, or run
+`secureai setup --platform claude`. That adds SecureAI's proxy to Claude Code's own
+settings (`~/.claude/settings.json` → `env`), so every Claude Code session uses it.
+`secureai setup --platform claude --undo` removes exactly those entries again.
 
-## Usage
+These helpers do the same for **one terminal only**:
 
 ```bash
-# print exports (eval into current shell)
-eval "$(./set-proxy.sh)"
-
-# or source
-source ./set-proxy.sh
+source ./set-proxy.sh          # bash / zsh
 ```
-
-Windows (PowerShell):
 
 ```powershell
-. .\set-proxy.ps1
+. .\set-proxy.ps1              # PowerShell
 ```
 
-Proxy URL resolution order:
+The proxy URL includes Claude Code's own SecureAI credentials
+(`http://claude:<token>@127.0.0.1:<port>`). They are derived from this computer's
+SecureAI key, are only accepted on this computer, and let SecureAI show when Claude
+Code is actually using the protected route.
 
-1. `SECUREAI_PROXY_URL`
-2. `secureai proxy-env` (CLI) when on `PATH`
-3. `http://127.0.0.1:${SECUREAI_GATEWAY_PORT:-17864}`
+## What this covers
 
-## Scope (truthful)
+- Claude Code (CLI and IDE extensions) started from a configured environment.
+- **Not** Claude Desktop, which manages its own connection.
+- `NO_PROXY` always keeps `localhost`, `127.0.0.1` and `::1` direct.
 
-- **Does not claim Protected.** Core remains the single authority; Protected requires gateway-attested egress verify.
-- Desktop-managed provider connections may **ignore** repo/shell proxy settings — see `docs/V1_LIMITATIONS.md` and `docs/INSTALL_CLAUDE.md`.
-- `NO_PROXY` always includes `localhost`, `127.0.0.1`, `::1`.
-
-## Remote / relay note
-
-Local Claude keeps the **gateway** / `proxy-env` path above.
-
-For remote Claude (future), operators may point HTTP(S)_PROXY at a TLS-terminated
-front of `secureai-relay` (`SECUREAI_RELAY_URL`). That does **not** claim Protected;
-Core remains the authority. See `docs/REMOTE_RELAY.md` (MVP implemented).
+SecureAI never reads prompts, code or responses: the gateway forwards encrypted
+connections without opening them.

@@ -19,7 +19,7 @@ const crypto = require('crypto');
 const { URL } = require('url');
 
 const PROTOCOL_MAJOR = 1;
-const PROTOCOL_MINOR = 0;
+const PROTOCOL_MINOR = 1;
 
 function env(name, fallback) {
   const v = process.env[name];
@@ -40,11 +40,24 @@ function proxyUrl() {
   return env('SECUREAI_PROXY_URL', `http://127.0.0.1:${env('SECUREAI_GATEWAY_PORT', '17864')}`);
 }
 
+/** Shared SecureAI client: packaged at ../lib, source tree at ../../shared. */
+function sharedLib() {
+  const path = require('path');
+  const fs = require('fs');
+  const built = path.join(__dirname, '..', 'lib', 'secureai-core.js');
+  return require(fs.existsSync(built) ? built : path.join(__dirname, '..', '..', 'shared', 'secureai-core.js'));
+}
+
+/**
+ * Auth secret. There is no built-in default: the relay needs an explicit
+ * SECUREAI_RELAY_SECRET; the local gateway uses this install's key. An empty
+ * value makes the gateway/relay refuse the request (reported as unauthorized).
+ */
 function authSecret() {
   if (useRelay()) {
-    return env('SECUREAI_RELAY_SECRET', env('SECUREAI_SECRET', 'dev-secret-change-me'));
+    return env('SECUREAI_RELAY_SECRET', '');
   }
-  return env('SECUREAI_GATEWAY_SECRET', env('SECUREAI_SECRET', 'dev-secret-change-me'));
+  return env('SECUREAI_GATEWAY_SECRET', '') || sharedLib().findSecret() || '';
 }
 
 function authHeaderName() {
