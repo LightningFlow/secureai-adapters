@@ -24,19 +24,19 @@ const SUPPORTED_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05'];
 const TOOLS = [
   {
     name: 'secureai_status',
-    description: 'Show whether SecureAI is protecting this tool’s connection right now.',
+    description: 'Show SecureAI Core’s route status and coverage limits for this platform.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
     annotations: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   },
   {
     name: 'secureai_protect',
-    description: 'Turn SecureAI protection on for this tool (the user’s choice is remembered).',
+    description: 'Request Core protection for supported local traffic (the user’s choice is remembered).',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
     annotations: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
   },
   {
     name: 'secureai_off',
-    description: 'Turn SecureAI protection off for this tool.',
+    description: 'Turn Core protection off for supported local traffic on this platform.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
     annotations: { readOnlyHint: false, openWorldHint: false, destructiveHint: true },
   },
@@ -54,7 +54,7 @@ async function statusText() {
   return withCore(PLATFORM, async (c) => {
     const s = await c.status();
     const mine = (s.statuses || []).find((x) => x.platform === PLATFORM);
-    return describe(mine);
+    return describe(mine, PLATFORM);
   });
 }
 
@@ -70,7 +70,7 @@ async function callTool(name) {
       }
       case 'secureai_off': {
         await withCore(PLATFORM, (c) => c.off(PLATFORM));
-        return text('Protection is off for this tool.');
+        return text('Core protection is off for supported local traffic on this platform.');
       }
       default:
         return text(`Unknown tool: ${name}`, true);

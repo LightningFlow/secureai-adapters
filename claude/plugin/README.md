@@ -15,12 +15,12 @@ Status always comes from SecureAI on this computer; the plugin never decides it.
 .claude-plugin/plugin.json
 hooks/hooks.json              SessionStart → lib/session-hook.js
 .mcp.json                     secureai MCP server → lib/mcp-server.js
-lib/                          shared SecureAI client (copied from adapters/shared at build)
+lib/                          bundled SecureAI client
 proxy-env-helper/             per-terminal proxy helper
 hooks/settings.fragment.json  manual install (uses $SECUREAI_HOME)
 ```
 
-Build the package with `scripts/build-adapters.ps1` (or `.sh`); `lib/` is generated.
+The distributed plugin already includes `lib/`.
 
 ## Routing Claude Code through SecureAI
 

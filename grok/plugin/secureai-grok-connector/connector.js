@@ -27,8 +27,20 @@ function env(name, fallback) {
 }
 
 function relayUrl() {
-  const u = env('SECUREAI_RELAY_URL', '');
-  return u ? u.replace(/\/$/, '') : '';
+  const raw = env('SECUREAI_RELAY_URL', '');
+  if (!raw) return '';
+  let parsed;
+  try {
+    parsed = new URL(raw);
+  } catch (_) {
+    throw new Error('invalid_relay_url');
+  }
+  const loopback = parsed.hostname === '127.0.0.1' || parsed.hostname === '[::1]';
+  if (parsed.username || parsed.password || parsed.search || parsed.hash ||
+      (parsed.protocol !== 'https:' && !(loopback && parsed.protocol === 'http:'))) {
+    throw new Error('relay_url_requires_https');
+  }
+  return parsed.toString().replace(/\/$/, '');
 }
 
 function useRelay() {
@@ -521,7 +533,7 @@ async function main() {
   const args = parseArgs(process.argv);
   if (args.mode === 'help') {
     console.log(`usage: connector.js [status|verify|protect] [--session UUID]
-env: SECUREAI_RELAY_URL (preferred; http:// or https://), SECUREAI_RELAY_SECRET,
+env: SECUREAI_RELAY_URL (HTTPS required except loopback tests), SECUREAI_RELAY_SECRET,
      SECUREAI_PROXY_URL, SECUREAI_GATEWAY_SECRET, SECUREAI_REMOTE=1
 note: https uses Node default TLS verify (never rejectUnauthorized:false)`);
     process.exit(0);

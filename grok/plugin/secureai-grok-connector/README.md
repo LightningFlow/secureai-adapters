@@ -30,15 +30,16 @@ node connector.js protect   # still refuses protected=true without Core
 
 ## Tests
 
-```bash
-cargo build -p secureai-relay
-node test/connector_relay.test.js
-```
+Run `node test/connector_relay.test.js`. The live relay cases require a
+`secureai-relay` binary built from the private SecureAI Core source; without it,
+the test checks unavailable-relay behavior and reports the live cases skipped.
 
 ## HTTPS relay URL
 
 Set `SECUREAI_RELAY_URL=https://relay.example.invalid:8443` to reach
 `secureai-tls` (public TLS → loopback relay).
+The connector rejects plaintext HTTP relay URLs outside literal loopback addresses
+so it cannot send relay credentials over an unencrypted remote connection.
 
 - Uses Node `https` / `tls` with **default** certificate verification
 - **Never** sets `rejectUnauthorized: false` (not a product path)

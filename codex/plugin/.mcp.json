@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "secureai": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["./lib/mcp-server.js", "--platform", "codex"],
+      "cwd": "./"
+    }
+  }
+}

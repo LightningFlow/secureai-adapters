@@ -1,6 +1,8 @@
 # SecureAI for Codex
 
-- `mcp-bridge.toml.example` — adds the `secureai` MCP server to Codex.
+- `.mcp.json` — registers the bundled `secureai` MCP server and its status,
+  protect, and off tools when the plugin is installed.
+- `mcp-bridge.toml.example` — manual fallback for older Codex installations.
 - `hooks/hooks.json` — at session start, turns protection on if you chose automatic
   protection. The hook never approves, denies or changes tool permissions. Codex
   asks you to review and trust an installed plugin hook before it can run.
@@ -14,5 +16,6 @@ To route the Codex CLI's own requests through SecureAI in a terminal:
 secureai proxy-env --platform codex | Invoke-Expression
 ```
 
-**Coverage (honest):** Codex cloud/hosted tools run on OpenAI's side and are not
-routed through SecureAI. See `docs/COVERAGE_CURSOR_CODEX.md`.
+**Partial Protection:** Codex cloud/hosted tools run on OpenAI's side and are not
+routed through SecureAI. The local Codex CLI can use SecureAI only when launched
+with the proxy environment above.

@@ -17,7 +17,7 @@ withCore('grok', (c) => c.status())
       JSON.stringify({
         platform: 'grok',
         state: mine ? mine.state : 'unknown',
-        summary: describe(mine),
+        summary: describe(mine, 'grok'),
         protected_truth: 'core_only',
       })
     );

@@ -206,14 +206,19 @@ async function withCore(platform, fn) {
   }
 }
 
-/** One calm sentence for a platform status (never claims more than Core says). */
-function describe(st) {
+/** Explain Core's route state without implying unsupported provider traffic is covered. */
+function describe(st, platform) {
   if (!st) return 'SecureAI has no status for this tool yet.';
   switch (st.state) {
-    case 'protected':
-      return st.traffic_seen_at
-        ? 'Protected. This tool is using SecureAI’s protected route.'
-        : 'Ready. SecureAI’s protected route is up; this tool hasn’t used it yet.';
+    case 'protected': {
+      const route = st.traffic_seen_at
+        ? 'SecureAI Core reports Protected for traffic observed on its route.'
+        : 'SecureAI Core reports its route ready; no traffic has been observed yet.';
+      if (platform === 'cursor') return `${route} Cursor’s own AI requests are not routed through SecureAI.`;
+      if (platform === 'codex') return `${route} Codex cloud tools are not routed through SecureAI.`;
+      if (platform === 'grok') return `${route} Remote Grok Bot traffic needs the separate relay.`;
+      return route;
+    }
     case 'requested':
     case 'connecting':
       return 'Turning on…';
