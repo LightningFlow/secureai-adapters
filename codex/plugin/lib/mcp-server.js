@@ -21,23 +21,61 @@ function argPlatform() {
 const PLATFORM = argPlatform();
 const SUPPORTED_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05'];
 
+// Mirrors secureai_protocol::SessionState. Anything else is reported as null.
+const CORE_STATES = ['off', 'requested', 'connecting', 'protected', 'reconnecting', 'failed', 'unsupported'];
+
+// Structured results repeat the text result; they never add a claim Core did not make.
+const ROUTE_STATUS_SCHEMA = {
+  type: 'object',
+  properties: {
+    platform: { type: 'string', enum: CUSTOMER_PLATFORMS },
+    state: {
+      type: ['string', 'null'],
+      enum: [...CORE_STATES, null],
+      description: 'Core’s session state for this platform; null when Core has no status for it.',
+    },
+    desired: { type: 'boolean', description: 'The user asked Core to protect this platform.' },
+    traffic_observed: {
+      type: 'boolean',
+      description: 'Core carried traffic for this platform in its current session.',
+    },
+    message: { type: 'string', description: 'The same text as the text content.' },
+  },
+  required: ['platform', 'state', 'desired', 'traffic_observed', 'message'],
+  additionalProperties: false,
+};
+
+const OFF_SCHEMA = {
+  type: 'object',
+  properties: {
+    platform: { type: 'string', enum: CUSTOMER_PLATFORMS },
+    desired: { type: 'boolean', const: false },
+    message: { type: 'string', description: 'The same text as the text content.' },
+  },
+  required: ['platform', 'desired', 'message'],
+  additionalProperties: false,
+};
+
 const TOOLS = [
   {
     name: 'secureai_status',
     description: 'Show SecureAI Core’s route status and coverage limits for this platform.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    outputSchema: ROUTE_STATUS_SCHEMA,
     annotations: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   },
   {
     name: 'secureai_protect',
     description: 'Request Core protection for supported local traffic (the user’s choice is remembered).',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    outputSchema: ROUTE_STATUS_SCHEMA,
     annotations: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
   },
   {
     name: 'secureai_off',
     description: 'Turn Core protection off for supported local traffic on this platform.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    outputSchema: OFF_SCHEMA,
     annotations: { readOnlyHint: false, openWorldHint: false, destructiveHint: true },
   },
 ];
@@ -50,11 +88,24 @@ function text(t, isError = false) {
   return { content: [{ type: 'text', text: t }], isError };
 }
 
-async function statusText() {
+function structured(data) {
+  return { ...text(data.message), structuredContent: data };
+}
+
+function routeStatus(st) {
+  return {
+    platform: PLATFORM,
+    state: st && CORE_STATES.includes(st.state) ? st.state : null,
+    desired: Boolean(st && st.desired),
+    traffic_observed: Boolean(st && st.traffic_seen_at),
+    message: describe(st, PLATFORM),
+  };
+}
+
+async function currentStatus() {
   return withCore(PLATFORM, async (c) => {
     const s = await c.status();
-    const mine = (s.statuses || []).find((x) => x.platform === PLATFORM);
-    return describe(mine, PLATFORM);
+    return routeStatus((s.statuses || []).find((x) => x.platform === PLATFORM));
   });
 }
 
@@ -63,14 +114,18 @@ async function callTool(name) {
   try {
     switch (name) {
       case 'secureai_status':
-        return text(await statusText());
+        return structured(await currentStatus());
       case 'secureai_protect': {
         await withCore(PLATFORM, (c) => c.protect(PLATFORM));
-        return text(await statusText());
+        return structured(await currentStatus());
       }
       case 'secureai_off': {
         await withCore(PLATFORM, (c) => c.off(PLATFORM));
-        return text('Core protection is off for supported local traffic on this platform.');
+        return structured({
+          platform: PLATFORM,
+          desired: false,
+          message: 'Core protection is off for supported local traffic on this platform.',
+        });
       }
       default:
         return text(`Unknown tool: ${name}`, true);
