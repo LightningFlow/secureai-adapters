@@ -1,12 +1,14 @@
 {
   "name": "secureai-cursor",
   "version": "0.1.0",
-  "description": "SecureAI Cursor adapter (MCP + hooks). Core owns Protected. Provider TLS: Partial Protection.",
-  "license": "UNLICENSED",
+  "description": "SecureAI for Cursor: status tools and automatic protection at session start. Cursor's own AI requests are not routed through SecureAI.",
+  "license": "MIT",
   "private": false,
   "files": [
     "README.md",
-    "plugin/**"
+    "plugin/**",
+    "plugin/**/.*",
+    "plugin/**/.*/**"
   ],
   "secureai": {
     "platform": "cursor",
@@ -14,5 +16,8 @@
     "protection": "Partial",
     "requiresCore": true,
     "note": "Does not intercept provider TLS; adapters must not invent Protected"
+  },
+  "scripts": {
+    "prepack": "node -e \"require('fs').accessSync('plugin/lib/secureai-core.js')\""
   }
 }

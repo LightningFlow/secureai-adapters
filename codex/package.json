@@ -1,15 +1,23 @@
 {
   "name": "secureai-codex",
   "version": "0.1.0",
-  "description": "SecureAI Codex adapter (hooks/MCP bridge). Core owns Protected. Provider TLS: Partial Protection.",
-  "license": "UNLICENSED",
+  "description": "SecureAI for Codex: status tools and automatic protection at session start. Grants no shell or file permissions. Codex cloud tools are not routed through SecureAI.",
+  "license": "MIT",
   "private": false,
-  "files": ["README.md", "plugin/**"],
+  "files": [
+    "README.md",
+    "plugin/**",
+    "plugin/**/.*",
+    "plugin/**/.*/**"
+  ],
   "secureai": {
     "platform": "codex",
     "classification": "PACKAGED",
     "protection": "Partial",
     "requiresCore": true,
     "monetization": "no-in-plugin-checkout"
+  },
+  "scripts": {
+    "prepack": "node -e \"require('fs').accessSync('plugin/lib/secureai-core.js')\""
   }
 }

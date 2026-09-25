@@ -19,7 +19,7 @@ const crypto = require('crypto');
 const { URL } = require('url');
 
 const PROTOCOL_MAJOR = 1;
-const PROTOCOL_MINOR = 0;
+const PROTOCOL_MINOR = 1;
 
 function env(name, fallback) {
   const v = process.env[name];
@@ -27,8 +27,20 @@ function env(name, fallback) {
 }
 
 function relayUrl() {
-  const u = env('SECUREAI_RELAY_URL', '');
-  return u ? u.replace(/\/$/, '') : '';
+  const raw = env('SECUREAI_RELAY_URL', '');
+  if (!raw) return '';
+  let parsed;
+  try {
+    parsed = new URL(raw);
+  } catch (_) {
+    throw new Error('invalid_relay_url');
+  }
+  const loopback = parsed.hostname === '127.0.0.1' || parsed.hostname === '[::1]';
+  if (parsed.username || parsed.password || parsed.search || parsed.hash ||
+      (parsed.protocol !== 'https:' && !(loopback && parsed.protocol === 'http:'))) {
+    throw new Error('relay_url_requires_https');
+  }
+  return parsed.toString().replace(/\/$/, '');
 }
 
 function useRelay() {
@@ -40,11 +52,24 @@ function proxyUrl() {
   return env('SECUREAI_PROXY_URL', `http://127.0.0.1:${env('SECUREAI_GATEWAY_PORT', '17864')}`);
 }
 
+/** Shared SecureAI client: packaged at ../lib, source tree at ../../shared. */
+function sharedLib() {
+  const path = require('path');
+  const fs = require('fs');
+  const built = path.join(__dirname, '..', 'lib', 'secureai-core.js');
+  return require(fs.existsSync(built) ? built : path.join(__dirname, '..', '..', 'shared', 'secureai-core.js'));
+}
+
+/**
+ * Auth secret. There is no built-in default: the relay needs an explicit
+ * SECUREAI_RELAY_SECRET; the local gateway uses this install's key. An empty
+ * value makes the gateway/relay refuse the request (reported as unauthorized).
+ */
 function authSecret() {
   if (useRelay()) {
-    return env('SECUREAI_RELAY_SECRET', env('SECUREAI_SECRET', 'dev-secret-change-me'));
+    return env('SECUREAI_RELAY_SECRET', '');
   }
-  return env('SECUREAI_GATEWAY_SECRET', env('SECUREAI_SECRET', 'dev-secret-change-me'));
+  return env('SECUREAI_GATEWAY_SECRET', '') || sharedLib().findSecret() || '';
 }
 
 function authHeaderName() {
@@ -508,7 +533,7 @@ async function main() {
   const args = parseArgs(process.argv);
   if (args.mode === 'help') {
     console.log(`usage: connector.js [status|verify|protect] [--session UUID]
-env: SECUREAI_RELAY_URL (preferred; http:// or https://), SECUREAI_RELAY_SECRET,
+env: SECUREAI_RELAY_URL (HTTPS required except loopback tests), SECUREAI_RELAY_SECRET,
      SECUREAI_PROXY_URL, SECUREAI_GATEWAY_SECRET, SECUREAI_REMOTE=1
 note: https uses Node default TLS verify (never rejectUnauthorized:false)`);
     process.exit(0);

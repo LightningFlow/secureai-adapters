@@ -30,9 +30,11 @@ function runConnector(args, env) {
 }
 
 function findRelayBin() {
+  const target = process.env.CARGO_TARGET_DIR || path.join(ROOT, 'target');
+  const exe = process.platform === 'win32' ? '.exe' : '';
   const candidates = [
-    path.join(ROOT, 'target/debug/secureai-relay'),
-    path.join(ROOT, 'target/release/secureai-relay'),
+    path.join(target, 'debug', `secureai-relay${exe}`),
+    path.join(target, 'release', `secureai-relay${exe}`),
   ];
   for (const c of candidates) {
     try {
@@ -127,6 +129,26 @@ function httpJson(method, urlStr, headers, body) {
 
 async function main() {
   let failed = 0;
+
+  // Remote relay credentials must never be sent to plaintext HTTP endpoints.
+  {
+    const { relayUrl } = require('../connector.js');
+    const prior = process.env.SECUREAI_RELAY_URL;
+    try {
+      for (const url of ['http://relay.example.invalid:8443', 'http://127.0.0.1.evil.example:8443']) {
+        process.env.SECUREAI_RELAY_URL = url;
+        assert.throws(() => relayUrl(), /relay_url_requires_https/);
+      }
+      process.env.SECUREAI_RELAY_URL = 'http://127.0.0.1:8443';
+      assert.strictEqual(relayUrl(), 'http://127.0.0.1:8443');
+      process.env.SECUREAI_RELAY_URL = 'https://relay.example.invalid:8443';
+      assert.strictEqual(relayUrl(), 'https://relay.example.invalid:8443');
+    } finally {
+      if (prior === undefined) delete process.env.SECUREAI_RELAY_URL;
+      else process.env.SECUREAI_RELAY_URL = prior;
+    }
+    console.log('ok remote_relay_requires_https');
+  }
 
   // 1) unavailable relay
   {

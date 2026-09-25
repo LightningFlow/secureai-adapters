@@ -1,0 +1,16 @@
+{
+  "name": "lightningflow",
+  "description": "LightningFlow integrations for Grok Build",
+  "owner": {
+    "name": "LightningFlow"
+  },
+  "plugins": [
+    {
+      "name": "secureai",
+      "source": "./grok/plugin",
+      "description": "Check SecureAI Core status and control protection in Grok Build. Remote Grok Bot use requires a separately configured relay.",
+      "category": "security",
+      "homepage": "https://lightningflow.ai/secureai/"
+    }
+  ]
+}

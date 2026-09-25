@@ -1,11 +1,8 @@
 {
   "mcpServers": {
     "secureai": {
-      "command": "secureai",
-      "args": ["status"],
-      "env": {
-        "SECUREAI_NOTE": "Replace with stdio MCP bridge that calls secureai-client; tools: secureai_status, secureai_protect, secureai_off"
-      }
+      "command": "node",
+      "args": ["${CURSOR_PLUGIN_ROOT}/lib/mcp-server.js", "--platform", "cursor"]
     }
   }
 }

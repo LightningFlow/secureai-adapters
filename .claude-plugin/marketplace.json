@@ -1,0 +1,14 @@
+{
+  "name": "lightningflow",
+  "description": "LightningFlow integrations for Claude Code",
+  "owner": {
+    "name": "LightningFlow"
+  },
+  "plugins": [
+    {
+      "name": "secureai",
+      "source": "./claude/plugin",
+      "description": "Check SecureAI Core status and control protection for Claude Code. Requires SecureAI Core."
+    }
+  ]
+}

@@ -1,34 +1,37 @@
-# SecureAI Claude proxy-env helper (Windows PowerShell) for local sessions.
-# Does NOT claim Protected — Core remains the authority.
-# Desktop-managed Claude sessions may ignore these env vars.
+# Route Claude Code in this PowerShell window through SecureAI.
+# Usage:  . "$env:SECUREAI_HOME\adapters\claude\proxy-env-helper\set-proxy.ps1"
+# The proxy URL carries Claude's own SecureAI credentials, so the gateway can
+# accept the traffic and SecureAI can show "Claude is using the protected route".
+# Claude Desktop manages its own connection and is not covered by this helper.
 
 function Resolve-SecureAiProxyUrl {
     if ($env:SECUREAI_PROXY_URL -and $env:SECUREAI_PROXY_URL.Trim() -ne "") {
         return $env:SECUREAI_PROXY_URL.Trim()
     }
-    $secureai = Get-Command secureai -ErrorAction SilentlyContinue
-    if ($secureai) {
-        $lines = & secureai proxy-env 2>$null
+    $cli = (Get-Command secureai -ErrorAction SilentlyContinue).Source
+    if (-not $cli -and $env:SECUREAI_HOME) {
+        $candidate = Join-Path $env:SECUREAI_HOME "bin\secureai.exe"
+        if (Test-Path $candidate) { $cli = $candidate }
+    }
+    if ($cli) {
+        $lines = & $cli proxy-env --platform claude --shell posix 2>$null
         foreach ($line in $lines) {
-            if ($line -match '^export SECUREAI_PROXY_URL=(.+)$') {
+            if ($line -match '^export HTTPS_PROXY=(.+)$') {
                 return $Matches[1]
             }
         }
     }
-    $port = if ($env:SECUREAI_GATEWAY_PORT) { $env:SECUREAI_GATEWAY_PORT } else { "17864" }
-    return "http://127.0.0.1:$port"
+    return $null
 }
 
 $Url = Resolve-SecureAiProxyUrl
+if (-not $Url) {
+    Write-Host "SecureAI isn't installed or isn't running, so Claude Code was left unchanged."
+    exit 1
+}
 $env:HTTP_PROXY = $Url
 $env:HTTPS_PROXY = $Url
 $env:NO_PROXY = "localhost,127.0.0.1,::1"
 $env:SECUREAI_PROXY_URL = $Url
 
-Write-Host "secureai: Claude local proxy env set (HTTP_PROXY/HTTPS_PROXY → $Url)"
-Write-Host "secureai: Core remains Protected authority; Desktop-managed sessions may ignore proxy"
-
-Write-Output "HTTP_PROXY=$Url"
-Write-Output "HTTPS_PROXY=$Url"
-Write-Output "NO_PROXY=localhost,127.0.0.1,::1"
-Write-Output "SECUREAI_PROXY_URL=$Url"
+Write-Host "Claude Code in this window will now use SecureAI."

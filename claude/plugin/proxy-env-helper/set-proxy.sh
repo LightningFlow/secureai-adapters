@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# SecureAI Claude proxy-env helper (local sessions).
-# Sets HTTP_PROXY/HTTPS_PROXY/NO_PROXY from Core/CLI proxy URL.
-# Does NOT claim Protected — Core remains the authority.
-# Desktop-managed Claude sessions may ignore these env vars (see V1_LIMITATIONS).
+# Route Claude Code in this terminal through SecureAI.
+# The proxy URL carries Claude's own SecureAI credentials, so the gateway can
+# accept the traffic and SecureAI can show "Claude is using the protected route".
+# Claude Desktop manages its own connection and is not covered by this helper.
 
 set -euo pipefail
 
@@ -11,27 +11,31 @@ resolve_url() {
     printf '%s' "$SECUREAI_PROXY_URL"
     return
   fi
+  local cli=""
   if command -v secureai >/dev/null 2>&1; then
-    # Prefer CLI when on PATH (prints export lines; extract URL)
+    cli="secureai"
+  elif [[ -n "${SECUREAI_HOME:-}" && -x "$SECUREAI_HOME/bin/secureai" ]]; then
+    cli="$SECUREAI_HOME/bin/secureai"
+  fi
+  if [[ -n "$cli" ]]; then
     local line
-    line="$(secureai proxy-env 2>/dev/null | grep '^export SECUREAI_PROXY_URL=' | head -1 || true)"
+    line="$("$cli" proxy-env --platform claude --shell posix 2>/dev/null | grep '^export HTTPS_PROXY=' | head -1 || true)"
     if [[ -n "$line" ]]; then
-      printf '%s' "${line#export SECUREAI_PROXY_URL=}"
+      printf '%s' "${line#export HTTPS_PROXY=}"
       return
     fi
   fi
-  local port="${SECUREAI_GATEWAY_PORT:-17864}"
-  printf 'http://127.0.0.1:%s' "$port"
+  echo "SecureAI isn't installed or isn't running, so Claude Code was left unchanged." >&2
+  return 1
 }
 
-URL="$(resolve_url)"
+URL="$(resolve_url)" || { [[ "${BASH_SOURCE[0]}" == "${0}" ]] && exit 1 || return 1; }
 export HTTP_PROXY="$URL"
 export HTTPS_PROXY="$URL"
 export NO_PROXY="localhost,127.0.0.1,::1"
 export SECUREAI_PROXY_URL="$URL"
 
-echo "secureai: Claude local proxy env set (HTTP_PROXY/HTTPS_PROXY → $URL)" >&2
-echo "secureai: Core remains Protected authority; Desktop-managed sessions may ignore proxy" >&2
+echo "Claude Code in this terminal will now use SecureAI." >&2
 
 # If sourced, exports stick; if executed, print exports for eval
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

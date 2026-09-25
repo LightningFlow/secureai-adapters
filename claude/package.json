@@ -1,13 +1,21 @@
 {
   "name": "secureai-claude",
   "version": "0.1.0",
-  "description": "SecureAI Claude Code adapter (hooks/MCP/proxy-env helper). Core owns Protected.",
-  "license": "UNLICENSED",
+  "description": "SecureAI for Claude Code: status tools, automatic protection at session start, and routing Claude Code through SecureAI.",
+  "license": "MIT",
   "private": false,
-  "files": ["README.md", "plugin/**"],
+  "files": [
+    "README.md",
+    "plugin/**",
+    "plugin/**/.*",
+    "plugin/**/.*/**"
+  ],
   "secureai": {
     "platform": "claude",
     "classification": "PACKAGED",
     "requiresCore": true
+  },
+  "scripts": {
+    "prepack": "node -e \"require('fs').accessSync('plugin/lib/secureai-core.js')\""
   }
 }

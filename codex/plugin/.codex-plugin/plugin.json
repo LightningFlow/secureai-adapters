@@ -1,6 +1,7 @@
 {
   "name": "secureai",
   "version": "0.1.0",
-  "description": "SecureAI Codex adapter — hooks/MCP bridge; no blanket shell permissions",
-  "hooks": "hooks/hooks.json"
+  "description": "Shows SecureAI status in Codex and turns protection on at session start. Grants no shell or file permissions.",
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": "./.mcp.json"
 }

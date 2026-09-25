@@ -1,0 +1,5 @@
+{
+  "name": "secureai",
+  "version": "0.1.0",
+  "description": "Check SecureAI Core status and control protection in Grok Build. Remote Grok Bot use requires a separately configured SecureAI relay."
+}

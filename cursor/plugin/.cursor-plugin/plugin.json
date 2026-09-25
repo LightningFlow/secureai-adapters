@@ -1,6 +1,7 @@
 {
   "name": "secureai",
   "version": "0.1.0",
-  "description": "SecureAI thin adapter for Cursor — status/protect via Core; does not intercept model TLS",
-  "mcp": "mcp.json"
+  "description": "Shows SecureAI status inside Cursor and turns protection on when you start a session. Cursor's own AI requests aren't routed through SecureAI.",
+  "mcpServers": "mcp.json",
+  "hooks": "hooks/hooks.json"
 }

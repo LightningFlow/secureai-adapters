@@ -3,15 +3,8 @@
   "hooks": {
     "sessionStart": [
       {
-        "command": "node",
-        "args": ["${SECUREAI_ADAPTER}/scripts/session-start.js"],
-        "description": "Request Auto-Protect from SecureAI Core when policy allows"
-      }
-    ],
-    "sessionEnd": [
-      {
-        "command": "node",
-        "args": ["${SECUREAI_ADAPTER}/scripts/session-end.js"]
+        "command": "node \"${CURSOR_PLUGIN_ROOT}/lib/session-hook.js\" start --platform cursor",
+        "description": "Turn SecureAI on for Cursor if automatic protection is enabled"
       }
     ]
   }
