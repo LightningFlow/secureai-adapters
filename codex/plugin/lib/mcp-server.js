@@ -26,16 +26,19 @@ const TOOLS = [
     name: 'secureai_status',
     description: 'Show whether SecureAI is protecting this tool’s connection right now.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    annotations: { readOnlyHint: true, openWorldHint: false, destructiveHint: false },
   },
   {
     name: 'secureai_protect',
     description: 'Turn SecureAI protection on for this tool (the user’s choice is remembered).',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    annotations: { readOnlyHint: false, openWorldHint: false, destructiveHint: false },
   },
   {
     name: 'secureai_off',
     description: 'Turn SecureAI protection off for this tool.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    annotations: { readOnlyHint: false, openWorldHint: false, destructiveHint: true },
   },
 ];
 
