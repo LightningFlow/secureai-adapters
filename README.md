@@ -15,8 +15,9 @@ Thin marketplace adapters for [SecureAI](https://lightningflow.ai/secureai/).
 2. Sign in to your LightningFlow account in SecureAI Core.
 3. For Claude Code, add this repository as a marketplace with `claude plugin marketplace add LightningFlow/secureai-adapters`, then install `secureai@lightningflow`.
 4. For Codex, add this repository with `codex plugin marketplace add LightningFlow/secureai-adapters`, then install `secureai@lightningflow` in the Plugins Directory.
+5. For Grok Build, add this repository with `grok plugin marketplace add LightningFlow/secureai-adapters`, then install and trust the `secureai` plugin. Remote Grok Bot traffic requires a production relay; this plugin alone does not route it.
 
-The Cursor and Grok adapters remain available in their directories while their public listings are prepared. Cursor and Codex offer Partial Protection; Cursor's own AI requests and Codex cloud tools are not routed through SecureAI.
+The Cursor adapter remains available in its directory while its public listing is prepared. Cursor and Codex offer Partial Protection; Cursor's own AI requests and Codex cloud tools are not routed through SecureAI.
 
 ## License
 MIT (adapters only). Core remains proprietary.
