@@ -150,6 +150,40 @@ async function main() {
     console.log('ok remote_relay_requires_https');
   }
 
+  // The local Core key may only be sent to a literal loopback gateway.
+  {
+    const { proxyUrl } = require('../connector.js');
+    const priorProxy = process.env.SECUREAI_PROXY_URL;
+    const priorRelay = process.env.SECUREAI_RELAY_URL;
+    try {
+      delete process.env.SECUREAI_RELAY_URL;
+      for (const url of [
+        'http://gateway.example.invalid:17864',
+        'http://127.0.0.1.evil.example:17864',
+        'http://127.0.0.1:17864@evil.example',
+        'http://0177.0.0.1:17864',
+        'http://0x7f000001:17864',
+        'http://2130706433:17864',
+        'http://127.0.0.1.:17864',
+        'https://127.0.0.1:17864',
+        'http://127.0.0.1:17864/other',
+      ]) {
+        process.env.SECUREAI_PROXY_URL = url;
+        assert.throws(() => proxyUrl(), /gateway_url_requires_loopback/);
+      }
+      process.env.SECUREAI_PROXY_URL = 'http://127.0.0.1:17864';
+      assert.strictEqual(proxyUrl(), 'http://127.0.0.1:17864');
+      process.env.SECUREAI_PROXY_URL = 'http://[::1]:17864';
+      assert.strictEqual(proxyUrl(), 'http://[::1]:17864');
+    } finally {
+      if (priorProxy === undefined) delete process.env.SECUREAI_PROXY_URL;
+      else process.env.SECUREAI_PROXY_URL = priorProxy;
+      if (priorRelay === undefined) delete process.env.SECUREAI_RELAY_URL;
+      else process.env.SECUREAI_RELAY_URL = priorRelay;
+    }
+    console.log('ok gateway_key_requires_loopback');
+  }
+
   // 1) unavailable relay
   {
     const r = runConnector(['verify'], {

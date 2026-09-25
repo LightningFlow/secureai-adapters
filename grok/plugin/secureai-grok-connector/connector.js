@@ -49,7 +49,24 @@ function useRelay() {
 
 function proxyUrl() {
   if (useRelay()) return relayUrl();
-  return env('SECUREAI_PROXY_URL', `http://127.0.0.1:${env('SECUREAI_GATEWAY_PORT', '17864')}`);
+  const raw = env('SECUREAI_PROXY_URL', `http://127.0.0.1:${env('SECUREAI_GATEWAY_PORT', '17864')}`);
+  // Check raw spelling before URL canonicalization: Node accepts numeric aliases
+  // such as 2130706433 and 0177.0.0.1 as loopback addresses.
+  if (!/^http:\/\/(?:127\.0\.0\.1|\[::1\])(?::[0-9]{1,5})?\/?$/.test(raw)) {
+    throw new Error('gateway_url_requires_loopback');
+  }
+  let parsed;
+  try {
+    parsed = new URL(raw);
+  } catch (_) {
+    throw new Error('gateway_url_requires_loopback');
+  }
+  const loopback = parsed.hostname === '127.0.0.1' || parsed.hostname === '[::1]';
+  if (parsed.protocol !== 'http:' || !loopback || parsed.username || parsed.password ||
+      parsed.search || parsed.hash || parsed.pathname !== '/') {
+    throw new Error('gateway_url_requires_loopback');
+  }
+  return parsed.toString().replace(/\/$/, '');
 }
 
 /** Shared SecureAI client: packaged at ../lib, source tree at ../../shared. */

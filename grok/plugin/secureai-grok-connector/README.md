@@ -16,7 +16,7 @@ node connector.js protect   # still refuses protected=true without Core
 | --- | --- |
 | `SECUREAI_RELAY_URL` | **Preferred** when set — authenticated relay base URL |
 | `SECUREAI_RELAY_SECRET` | Relay control auth (`X-SecureAI-Relay-Auth`) |
-| `SECUREAI_PROXY_URL` | Gateway proxy URL when relay URL unset |
+| `SECUREAI_PROXY_URL` | Local Core gateway override when relay URL unset; literal `http://127.0.0.1` or `http://[::1]` only |
 | `SECUREAI_GATEWAY_SECRET` / `SECUREAI_SECRET` | Gateway control/proxy auth |
 | `SECUREAI_REMOTE=1` / `GROK_REMOTE=1` | Remote mode → `Unsupported` + `GROK_GATEWAY_DEPENDENCY` if gateway unreachable and no relay |
 
@@ -27,6 +27,11 @@ node connector.js protect   # still refuses protected=true without Core
 - Otherwise: egress probe **through** the CONNECT/HTTP gateway proxy requiring a gateway-attested proof.
 - If remote cannot reach the LF-HOST loopback gateway and no relay is configured: `Unsupported` / `GROK_GATEWAY_DEPENDENCY`.
 - Core remains the authority for session `Protected`.
+- The Core gateway key is sent only to a configured literal loopback HTTP
+  endpoint. A custom loopback port is trusted configuration; the connector
+  cannot attest the listener is Core before sending the key. The
+  separate relay secret is sent only to an explicitly configured HTTPS relay
+  (or literal loopback HTTP for local tests). No telemetry endpoint is used.
 
 ## Tests
 
